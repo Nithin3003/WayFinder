@@ -4,6 +4,14 @@ WayFinder (Universal Intent Bridge Core) is an AI-driven platform that translate
 
 ---
 
+## Demo
+
+<video src="https://github.com/Nithin3003/WayFinder/raw/main/WayFinder.mp4" controls="controls" style="max-width: 100%;">
+  Your browser does not support the video tag.
+</video>
+
+---
+
 ## Key Features
 
 * **Natural Goal Parsing:** Converts conversational user prompts into structured tasks, urgency scores, and summaries.
@@ -20,5 +28,13 @@ WayFinder (Universal Intent Bridge Core) is an AI-driven platform that translate
 * **AI Core:** Google Generative AI (`google-generativeai`)
 * **Frontend:** HTML5, Tailwind CSS, JavaScript (Fetch API)
 
-<video src="https://github.com/Nithin3003/WayFinder/blob/main/WayFinder.mp4" controls="controls" style="max-width: 100%;">
-</video>
+---
+
+## Repository Structure
+
+```text
+.
+├── main.py            # FastAPI server and intent reasoning logic
+├── index.html          # Web dashboard interface
+├── requirements.txt    # Python dependencies
+└── README.md           # Project documentation
