@@ -1,10 +1,10 @@
 {
   "version": 2,
   "builds": [
-    { "src": "universal_intent_bridge/**", "use": "@vercel/static" }
+    { "src": "/**", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "^/$", "dest": "/universal_intent_bridge/index.html" },
-    { "src": "^/(.*)", "dest": "/universal_intent_bridge/$1" }
+    { "src": "^/$", "dest": "/index.html" },
+    { "src": "^/(.*)", "dest": "/$1" }
   ]
 }
