@@ -1,0 +1,1057 @@
+<!doctype html>
+<html lang="en" class="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WayFinder| AI Reasoning</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: { extend: {} },
+      };
+    </script>
+    <style>
+      :root {
+        --navy: #0b2545;
+        --deep: #122230;
+        --gold: #d4af37;
+        --ivory: #faf7f2;
+        --muted: #94a3b8;
+        --status-ready: #10b981;
+        --border-subtle: #334155;
+        --glass-border: rgba(226, 232, 240, 0.9);
+      }
+
+      body {
+        background-color: var(--ivory);
+        background-image:
+          radial-gradient(
+            at 0% 0%,
+            rgba(16, 185, 129, 0.06) 0px,
+            transparent 40%
+          ),
+          radial-gradient(
+            at 100% 0%,
+            rgba(37, 99, 235, 0.06) 0px,
+            transparent 40%
+          ),
+          radial-gradient(
+            at 50% 100%,
+            rgba(245, 158, 11, 0.04) 0px,
+            transparent 40%
+          ),
+          linear-gradient(
+            to right,
+            rgba(226, 232, 240, 0.18) 1px,
+            transparent 1px
+          ),
+          linear-gradient(
+            to bottom,
+            rgba(226, 232, 240, 0.18) 1px,
+            transparent 1px
+          );
+        background-size:
+          100% 100%,
+          100% 100%,
+          100% 100%,
+          32px 32px,
+          32px 32px;
+        color: var(--deep);
+        background-attachment: fixed;
+      }
+
+      /* Enhanced glass-card for depth */
+      .glass-card {
+        background: rgba(255, 255, 255, 0.86);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: none;
+        box-shadow: 0 12px 40px -12px rgba(11, 37, 69, 0.08);
+        border-radius: 14px;
+      }
+
+      .premium-cta {
+        background-image: linear-gradient(
+          90deg,
+          var(--navy),
+          #274b7a,
+          var(--gold)
+        );
+        color: #fff !important;
+      }
+      .glow-navy {
+        box-shadow: 0 8px 30px rgba(11, 37, 69, 0.08);
+      }
+
+      /* Satin pill and status badges */
+      .preset-pill {
+        background: #f1f5f9;
+        color: #0f172a;
+        border: 1px solid #e6e9ee;
+        transition:
+          transform 0.14s ease,
+          box-shadow 0.14s ease,
+          background-color 0.14s ease;
+      }
+      .preset-pill:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(11, 37, 69, 0.06);
+        background-color: rgba(11, 37, 69, 0.03);
+      }
+      .satin-badge {
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-width: 76px;
+        box-sizing: border-box;
+        text-align: center;
+        font-size: 0.8rem;
+      }
+      .badge-ready {
+        background: rgba(16, 185, 129, 0.12);
+        color: #059669;
+        border: 1px solid rgba(16, 185, 129, 0.18);
+      }
+      .badge-estimated {
+        background: rgba(245, 158, 11, 0.08);
+        color: #92400e;
+        border: 1px solid rgba(245, 158, 11, 0.12);
+      }
+
+      /* Micro-interactions */
+      .card-action:hover {
+        transform: translateY(-3px) scale(1.01);
+        transition: transform 0.18s ease;
+        box-shadow: 0 10px 30px rgba(11, 37, 69, 0.06);
+      }
+
+      /* Microphone / waveform */
+      .mic-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 10px;
+        background: #fff;
+        border: 1px solid #e6e9ee;
+        cursor: pointer;
+      }
+      .waveform {
+        width: 140px;
+        height: 28px;
+        display: inline-block;
+        position: relative;
+        opacity: 0;
+      }
+      .waveform.active {
+        opacity: 1;
+        transition: opacity 0.2s ease;
+      }
+      .wave {
+        position: absolute;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(180deg, var(--gold), #c99a2b);
+        border-radius: 2px;
+        animation: waveAnim 800ms linear infinite;
+      }
+      .wave:nth-child(2) {
+        left: 20px;
+        animation-delay: 80ms;
+      }
+      .wave:nth-child(3) {
+        left: 40px;
+        animation-delay: 160ms;
+      }
+      .wave:nth-child(4) {
+        left: 60px;
+        animation-delay: 240ms;
+      }
+      .wave:nth-child(5) {
+        left: 80px;
+        animation-delay: 320ms;
+      }
+      .wave:nth-child(6) {
+        left: 100px;
+        animation-delay: 400ms;
+      }
+      @keyframes waveAnim {
+        0% {
+          height: 4px;
+        }
+        50% {
+          height: 20px;
+        }
+        100% {
+          height: 4px;
+        }
+      }
+
+      /* Dropzone */
+      #dropzone {
+        border: 1px dashed #e6e9ee;
+        background: #fff;
+        padding: 10px 12px;
+        border-radius: 10px;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+
+      /* Pipeline chips */
+      .pipeline {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+      }
+      .pipeline-chip {
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: #f8fafc;
+        border: 1px solid #eef2ff;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .pipeline-chip.active {
+        background: linear-gradient(90deg, var(--navy), #274b7a);
+        color: #fff;
+        box-shadow: 0 6px 20px rgba(11, 37, 69, 0.08);
+      }
+
+      /* Timeline */
+      .timeline {
+        position: relative;
+        padding-left: 28px;
+      }
+      .timeline::before {
+        content: "";
+        position: absolute;
+        left: 12px;
+        top: 8px;
+        bottom: 8px;
+        width: 2px;
+        background: #e6e9ee;
+        border-radius: 2px;
+      }
+      .timeline-item {
+        position: relative;
+        padding: 14px 12px 14px 28px;
+        border-radius: 10px;
+        background: #fff;
+        border: 1px solid #eef2ff;
+      }
+      .timeline-node {
+        position: absolute;
+        left: 4px;
+        top: 18px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #fff;
+        border: 3px solid #e6e9ee;
+      }
+      .timeline-item.completed .timeline-node {
+        background: var(--status-ready);
+        border-color: rgba(16, 185, 129, 0.2);
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.12);
+      }
+
+      /* Drawer */
+      /* Drawer */
+      #drawer {
+        position: fixed;
+        right: -540px;
+        top: 72px;
+        width: 480px;
+        height: calc(100% - 140px);
+        background: #fff;
+        border-left: 1px solid rgba(226, 232, 240, 0.6);
+        box-shadow: -20px 0 60px rgba(11, 37, 69, 0.06);
+        transition: right 0.28s ease, opacity 0.18s ease, transform 0.28s ease;
+        z-index: 60;
+        padding: 18px;
+        overflow: auto;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(16px);
+      }
+      #drawer.open {
+        right: 24px;
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateX(0);
+      }
+      #drawer ::-webkit-scrollbar {
+        width: 8px;
+      }
+      #drawer ::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, var(--gold), #c99a2b);
+        border-radius: 6px;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #fff;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, var(--gold), #c99a2b);
+        border-radius: 6px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #c99a2b;
+      }
+
+      /* Primary solid emerald button: increase prominence */
+      .primary-btn {
+        background: var(--status-ready);
+        color: #fff;
+        padding: 1.1rem 1.25rem;
+        font-size: 1rem;
+        box-shadow: 0 12px 30px rgba(16, 185, 129, 0.12);
+        border-radius: 16px;
+      }
+      .primary-btn:active {
+        transform: translateY(1px);
+      }
+
+      header h1 {
+        color: var(--navy);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen p-4 md:p-8 font-sans">
+    <div class="max-w-6xl mx-auto space-y-6">
+      <!-- Header HUD -->
+      <header
+        class="glass-card p-6 rounded-2xl flex flex-wrap justify-between items-center gap-4 border border-blue-500/20 shadow-2xl relative overflow-hidden"
+      >
+        <div
+          class="absolute top-0 right-0 w-80 h-80 bg-blue-500/5 rounded-full filter blur-3xl pointer-events-none"
+        ></div>
+
+        <div class="space-y-1">
+          <div class="flex items-center space-x-3">
+            <span class="flex h-3 w-3 relative">
+              <span
+                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
+              ></span>
+              <span
+                class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"
+              ></span>
+            </span>
+            <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">
+              WayFinder
+            </h1>
+          </div>
+          <p class="text-xs" style="color: var(--muted)">
+            Translating human goals into clear, institutional action plans
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span
+            class="px-3.5 py-1.5 glass-card text-[#0F172A] preset-pill text-xs rounded-xl flex items-center gap-2 font-mono"
+          >
+            <span
+              class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"
+            ></span>
+            Gemini Core Active
+          </span>
+        </div>
+      </header>
+
+      <!-- Judge Preset Launcher Bar -->
+      <div
+        class="glass-card p-4 rounded-xl flex flex-wrap gap-2.5 items-center text-xs border border-slate-800"
+      >
+        <span
+          class="text-slate-400 font-semibold mr-2 font-mono flex items-center gap-1.5"
+        >
+          <svg
+            class="w-4 h-4 text-blue-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 10V3L4 14h7v7l9-11h-7z"
+            />
+          </svg>
+          TRY REAL EXAMPLES:
+        </span>
+        <button
+          onclick="applyPreset('job')"
+          class="px-3.5 py-2 rounded-xl preset-pill transition flex items-center gap-1.5 font-medium"
+        >
+          💼 Job Loss & Support
+        </button>
+        <button
+          onclick="applyPreset('elderly')"
+          class="px-3.5 py-2 rounded-xl preset-pill transition flex items-center gap-1.5 font-medium"
+        >
+          👵 Senior Benefits Access
+        </button>
+        <button
+          onclick="applyPreset('housing')"
+          class="px-3.5 py-2 rounded-xl preset-pill transition flex items-center gap-1.5 font-medium"
+        >
+          🏠 Emergency Housing Aid
+        </button>
+      </div>
+
+      <!-- Main Workspace Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Left Panel: Natural Language Goal Ingestion -->
+        <div
+          class="glass-card p-6 rounded-2xl space-y-5 flex flex-col justify-between border border-slate-800 shadow-xl"
+        >
+          <div class="space-y-4">
+            <div
+              class="flex justify-between items-center border-b border-slate-800 pb-3"
+            >
+              <h2
+                class="text-sm font-bold tracking-wide flex items-center gap-2"
+                style="color: var(--deep)"
+              >
+                <svg
+                  class="w-4 h-4 text-blue-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                  />
+                </svg>
+                1. WHAT ARE YOU TRYING TO ACCOMPLISH?
+              </h2>
+              <span
+                class="text-[10px] font-mono preset-pill px-2 py-0.5 rounded"
+                >YOUR GOAL</span
+              >
+            </div>
+
+            <div>
+              <label
+                class="block text-xs mb-2 font-medium"
+                style="color: var(--deep)"
+                >Describe your situation in plain words</label
+              >
+              <div class="space-y-2">
+                <div class="flex items-start gap-3">
+                  <button id="micBtn" class="mic-btn" title="Speak your story">
+                    <span>🎙️</span>
+                    <span class="text-sm font-medium">Speak Your Story</span>
+                  </button>
+                  <div class="waveform" id="waveform">
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                  </div>
+                </div>
+
+                <textarea
+                  id="intentInput"
+                  rows="7"
+                  class="w-full p-4 rounded-xl bg-[#F1F5F9] border border-[#E6E9EE] text-sm text-[#0F172A] focus:outline-none focus:border-[var(--status-ready)] transition leading-relaxed font-sans"
+                  placeholder="e.g. I lost my job last week and need help finding government support, updating my resume, and applying for unemployment benefits..."
+                ></textarea>
+
+                <label id="dropzone" for="fileInput"
+                  >📎 Attach photos of bills, letters, or IDs for instant
+                  parsing</label
+                >
+                <input
+                  id="fileInput"
+                  type="file"
+                  accept="image/*,application/pdf"
+                  multiple
+                  class="hidden"
+                />
+              </div>
+            </div>
+          </div>
+
+          <button
+            onclick="submitIntent()"
+            id="processBtn"
+            class="w-full py-4 primary-btn hover:brightness-95 text-white font-bold rounded-xl text-sm transition tracking-wider shadow-lg flex items-center justify-center gap-2"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              />
+            </svg>
+            <span>Find Help & Next Steps</span>
+          </button>
+        </div>
+
+        <!-- Right Panel: Structured Institutional Navigation Engine -->
+        <div
+          class="glass-card p-6 rounded-2xl space-y-5 border border-slate-800 shadow-2xl flex flex-col justify-between"
+        >
+          <div>
+            <div
+              class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4"
+            >
+              <h2
+                class="text-sm font-bold tracking-wide flex items-center gap-2"
+                style="color: var(--deep)"
+              >
+                <svg
+                  class="w-4 h-4 text-emerald-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                2. INSTITUTIONAL ACTION PLAN
+              </h2>
+              <span
+                id="urgencyBadge"
+                class="hidden px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono"
+                >--</span
+              >
+            </div>
+
+            <!-- Pipeline Loader (animated chips) -->
+            <div id="loader" class="hidden py-6 text-center">
+              <div class="pipeline" id="pipeline">
+                <div class="pipeline-chip" data-step="parsing">
+                  Parsing Intent
+                </div>
+                <div class="">→</div>
+                <div class="pipeline-chip" data-step="eligibility">
+                  Checking Eligibility Databases
+                </div>
+                <div class="">→</div>
+                <div class="pipeline-chip" data-step="building">
+                  Building Action Plan
+                </div>
+              </div>
+              <div id="pipelineSteps" class="mt-3 text-xs text-slate-500">
+                🤖 Preparing...
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div
+              id="emptyState"
+              class="py-20 text-center space-y-3 text-slate-500"
+            >
+              <div
+                class="w-16 h-16 rounded-full bg-gradient-to-tr from-indigo-50 to-emerald-50 flex items-center justify-center mx-auto"
+              >
+                <!-- Simple animated AI wave icon -->
+                <svg
+                  width="44"
+                  height="28"
+                  viewBox="0 0 44 28"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M2 18 C8 6, 20 26, 28 8, 36 26, 42 6, 42 6"
+                    stroke="url(#g)"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    fill="none"
+                  >
+                    <animate
+                      attributeName="stroke-opacity"
+                      values="0.2;1;0.2"
+                      dur="2s"
+                      repeatCount="indefinite"
+                    />
+                  </path>
+                  <defs>
+                    <linearGradient id="g" x1="0" x2="1">
+                      <stop offset="0%" stop-color="#2dd4bf" />
+                      <stop offset="50%" stop-color="#60a5fa" />
+                      <stop offset="100%" stop-color="#f59e0b" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <p class="text-sm font-medium">
+                Enter your goal on the left or select a preset to generate a
+                structured action plan.
+              </p>
+              <div class="mt-3 flex justify-center gap-2">
+                <button
+                  class="preset-pill text-xs px-3 py-1"
+                  onclick="applyPreset('job')"
+                >
+                  Try: "I lost my job last week"
+                </button>
+                <button
+                  class="preset-pill text-xs px-3 py-1"
+                  onclick="applyPreset('housing')"
+                >
+                  Try: "I am behind on rent"
+                </button>
+              </div>
+            </div>
+
+            <!-- Results Container -->
+            <div id="resultsContainer" class="hidden space-y-4">
+              <!-- Goal Summary Box -->
+              <div
+                class="p-4 bg-slate-950/80 rounded-xl border border-slate-800 space-y-1"
+              >
+                <span
+                  class="text-[10px] text-blue-400 font-bold uppercase font-mono tracking-wider block"
+                  >PARSED GOAL SUMMARY</span
+                >
+                <p
+                  id="intentSummary"
+                  class="text-xs text-slate-200 font-medium leading-relaxed font-sans"
+                ></p>
+              </div>
+
+              <!-- Missing Info Box -->
+              <div
+                id="missingInfoBox"
+                class="p-4 bg-amber-950/30 border border-amber-500/30 rounded-xl space-y-1.5"
+              >
+                <span
+                  class="text-[10px] text-amber-400 font-bold uppercase font-mono tracking-wider flex items-center gap-1.5"
+                >
+                  <svg
+                    class="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
+                  </svg>
+                  INFORMATION NEEDED TO PROCEED
+                </span>
+                <p
+                  id="followupQuestion"
+                  class="text-xs text-amber-200/90 leading-relaxed font-sans"
+                ></p>
+              </div>
+
+              <!-- Step-by-Step Action Plan -->
+              <div>
+                <span
+                  class="text-[10px] text-slate-400 font-bold uppercase font-mono tracking-wider block mb-2"
+                  >ADAPTIVE ACTION PLAN TASKS</span
+                >
+                <div id="taskList" class="space-y-2.5 timeline"></div>
+
+                <!-- Slide-out Drawer for task details -->
+                <div id="drawer" aria-hidden="true">
+                  <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold">Task Details</h3>
+                    <button
+                      id="closeDrawer"
+                      class="px-3 py-1 rounded bg-[#F1F5F9] border border-[#E6E9EE]"
+                    >
+                      Close
+                    </button>
+                  </div>
+                  <div id="drawerContent">
+                    <div id="requiredDocs" class="mb-4">
+                      <h4 class="text-sm font-semibold mb-2">
+                        Required Documents
+                      </h4>
+                      <div id="docList" class="space-y-2"></div>
+                    </div>
+                    <div id="draftArea">
+                      <h4 class="text-sm font-semibold mb-2">
+                        Pre-filled Draft Letter
+                      </h4>
+                      <div class="flex gap-2 mb-3">
+                        <button
+                          id="copyDraftBtn"
+                          class="px-3 py-1 satin-badge badge-ready"
+                        >
+                          Copy Draft
+                        </button>
+                        <button id="exportPdfBtn" class="px-3 py-1 satin-badge">
+                          Export PDF
+                        </button>
+                      </div>
+                      <pre
+                        id="drawerDraft"
+                        class="p-3 bg-[#F8FAFC] rounded text-sm text-[#0F172A] max-h-64 overflow-auto"
+                      ></pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Generated Artifact Draft Letter Accordion -->
+              <div
+                id="artifactBox"
+                class="p-4 bg-slate-950/80 rounded-xl border border-slate-800 space-y-2 hidden"
+              >
+                <div class="flex justify-between items-center">
+                  <span
+                    class="text-[10px] text-emerald-400 font-bold uppercase font-mono tracking-wider flex items-center gap-1.5"
+                  >
+                    <svg
+                      class="w-3.5 h-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                    GENERATED OFFICIAL DRAFT COMMUNICATION
+                  </span>
+                  <button
+                    onclick="copyDraftLetter()"
+                    class="text-[10px] text-cyan-400 hover:text-cyan-300 font-mono"
+                  >
+                    COPY DRAFT
+                  </button>
+                </div>
+                <pre
+                  id="draftLetterContent"
+                  class="p-3 bg-slate-900 rounded-lg text-slate-300 font-mono text-[11px] whitespace-pre-wrap leading-relaxed border border-slate-800/80 max-h-36 overflow-y-auto"
+                ></pre>
+              </div>
+            </div>
+          </div>
+
+          <div
+            id="statusFooter"
+            class="p-3 rounded-xl bg-[#F1F5F9] border border-[#E6E9EE] text-[11px] text-[#0F172A] text-center font-sans font-medium"
+          >
+            Ready to create your step-by-step guide
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function applyPreset(type) {
+        const input = document.getElementById("intentInput");
+        const btnText = document.querySelector("#processBtn span");
+        if (type === "job") {
+          input.value =
+            "I lost my job last week and need help finding government support, updating my resume, and applying for unemployment benefits.";
+          if (btnText) btnText.innerText = "Generate Job Support Plan";
+        } else if (type === "elderly") {
+          input.value =
+            "I need help getting my 78-year-old mother access to government healthcare benefits and assistance with her monthly prescriptions.";
+          if (btnText) btnText.innerText = "Generate Senior Benefits Plan";
+        } else if (type === "housing") {
+          input.value =
+            "I am behind on rent due to medical bills and need emergency housing assistance before my landlord files for eviction.";
+          if (btnText) btnText.innerText = "Generate Housing Assistance Plan";
+        }
+        submitIntent();
+      }
+
+      async function submitIntent() {
+        const text = document.getElementById("intentInput").value;
+        if (!text || !text.trim()) return alert("Please enter your goal.");
+
+        const loader = document.getElementById("loader");
+        const emptyState = document.getElementById("emptyState");
+        const resultsContainer = document.getElementById("resultsContainer");
+        const btn = document.getElementById("processBtn");
+        const urgencyBadge = document.getElementById("urgencyBadge");
+        const statusFooter = document.getElementById("statusFooter");
+
+        // show pipeline animation
+        showPipeline();
+        // show progressive step text
+        setPipelineStep("🤖 Analyzing input...");
+
+        btn.disabled = true;
+        emptyState.classList.add("hidden");
+        resultsContainer.classList.add("hidden");
+        loader.classList.remove("hidden");
+
+        try {
+          const response = await fetch("/api/v1/bridge/intent", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_input: text }),
+          });
+
+          const res = await response.json();
+          const data = res.data;
+
+          // Render Urgency Badge
+          const urgency = data.urgency || "MEDIUM";
+          urgencyBadge.innerText = `URGENCY: ${urgency}`;
+          urgencyBadge.classList.remove("hidden");
+          if (urgency === "CRITICAL") {
+            urgencyBadge.className =
+              "px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono bg-rose-500/20 text-rose-400 border border-rose-500/40";
+          } else if (urgency === "HIGH") {
+            urgencyBadge.className =
+              "px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono bg-amber-500/20 text-amber-400 border border-amber-500/40";
+          } else {
+            urgencyBadge.className =
+              "px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono bg-blue-500/20 text-blue-400 border border-blue-500/40";
+          }
+
+          // Render Summary & Followup
+          document.getElementById("intentSummary").innerText =
+            data.intent_summary;
+          document.getElementById("followupQuestion").innerText =
+            data.followup_question || "All essential initial details gathered.";
+
+          // Render Timeline Task List
+          const taskList = document.getElementById("taskList");
+          taskList.innerHTML = "";
+
+          if (data.action_plan && data.action_plan.length > 0) {
+            data.action_plan.forEach((task, index) => {
+              const item = document.createElement("div");
+              item.className = "timeline-item card-action";
+              if (task.status === "COMPLETED" || task.status === "READY")
+                item.classList.add("completed");
+
+              const node = document.createElement("div");
+              node.className = "timeline-node";
+              item.appendChild(node);
+
+              const header = document.createElement("div");
+              header.className = "flex justify-between items-center";
+              header.innerHTML = `<span class="text-sm font-bold text-[#0F172A]">${index + 1}. ${task.title}</span>`;
+
+              const statusSpan = document.createElement("span");
+              statusSpan.className = "satin-badge";
+              if (task.status === "COMPLETED" || task.status === "READY") {
+                statusSpan.classList.add("badge-ready");
+                statusSpan.innerText = "READY";
+              } else if (task.status === "NEEDS_INFO") {
+                statusSpan.classList.add("badge-estimated");
+                statusSpan.innerText = "NEEDS INFO";
+              } else if (task.status === "BLOCKED") {
+                statusSpan.innerText = "BLOCKED";
+              } else {
+                statusSpan.innerText = task.status || "PENDING";
+              }
+
+              header.appendChild(statusSpan);
+              item.appendChild(header);
+
+              const desc = document.createElement("p");
+              desc.className = "text-sm text-[#374151] mt-2";
+              desc.innerText = task.plain_explanation || "";
+              item.appendChild(desc);
+
+              // store task data on element
+              item.dataset.index = index;
+              item.dataset.task = JSON.stringify(task);
+
+              item.addEventListener("click", () => openDrawer(task));
+
+              taskList.appendChild(item);
+            });
+          }
+
+          // mark pipeline complete
+          completePipeline();
+          setPipelineStep("✅ Complete");
+
+          // Render Draft Communication Artifact if present
+          const artifactBox = document.getElementById("artifactBox");
+          if (
+            data.generated_artifacts &&
+            data.generated_artifacts.draft_email_or_letter
+          ) {
+            document.getElementById("draftLetterContent").innerText =
+              data.generated_artifacts.draft_email_or_letter;
+            artifactBox.classList.remove("hidden");
+          } else {
+            artifactBox.classList.add("hidden");
+          }
+
+          statusFooter.innerText = `● GENERATED ${data.action_plan ? data.action_plan.length : 0} INSTITUTIONAL STEPS // URGENCY: ${urgency}`;
+          resultsContainer.classList.remove("hidden");
+
+          // populate drawer draft if present
+          const drawerDraft = document.getElementById("drawerDraft");
+          if (
+            drawerDraft &&
+            data.generated_artifacts &&
+            data.generated_artifacts.draft_email_or_letter
+          ) {
+            drawerDraft.innerText =
+              data.generated_artifacts.draft_email_or_letter;
+          }
+        } catch (err) {
+          alert(
+            "Failed to process intent. Verify backend server is running on localhost:8004.",
+          );
+          console.error(err);
+        } finally {
+          btn.disabled = false;
+          loader.classList.add("hidden");
+          hidePipeline();
+        }
+      }
+
+      function setPipelineStep(text) {
+        const el = document.getElementById("pipelineSteps");
+        if (el) el.innerText = text;
+      }
+
+      /* Pipeline animation controls */
+      function showPipeline() {
+        const pipeline = document.getElementById("pipeline");
+        pipeline.querySelectorAll(".pipeline-chip").forEach((c, i) => {
+          c.classList.remove("active");
+          setTimeout(() => {
+            if (i === 0) c.classList.add("active");
+          }, i * 400);
+        });
+        document.getElementById("loader").classList.remove("hidden");
+      }
+      function completePipeline() {
+        const chips = document.querySelectorAll(".pipeline-chip");
+        chips.forEach((c, i) =>
+          setTimeout(() => c.classList.add("active"), i * 250),
+        );
+      }
+      function hidePipeline() {
+        document.getElementById("loader").classList.add("hidden");
+      }
+
+      /* Drawer functions */
+      function openDrawer(task) {
+        const drawer = document.getElementById("drawer");
+        const docList = document.getElementById("docList");
+        const drawerDraft = document.getElementById("drawerDraft");
+        docList.innerHTML = "";
+        if (task.required_documents && task.required_documents.length > 0) {
+          task.required_documents.forEach((d) => {
+            const row = document.createElement("div");
+            row.className = "flex items-center justify-between gap-2";
+            row.innerHTML = `<div class="flex items-center gap-2"><span>📄</span><span class="text-sm">${d}</span></div><div><input type="file" class="text-sm" /></div>`;
+            docList.appendChild(row);
+          });
+        } else {
+          docList.innerHTML =
+            '<div class="text-sm text-[#6b7280]">No documents listed for this task.</div>';
+        }
+        drawerDraft.innerText =
+          task.generated_draft || task.plain_explanation || "";
+        drawer.classList.add("open");
+        drawer.setAttribute("aria-hidden", "false");
+      }
+      function closeDrawer() {
+        document.getElementById("drawer").classList.remove("open");
+        document.getElementById("drawer").setAttribute("aria-hidden", "true");
+      }
+
+      document
+        .getElementById("closeDrawer")
+        .addEventListener("click", closeDrawer);
+      document.getElementById("copyDraftBtn").addEventListener("click", () => {
+        const text = document.getElementById("drawerDraft").innerText;
+        navigator.clipboard.writeText(text);
+        alert("Draft copied");
+      });
+      document.getElementById("exportPdfBtn").addEventListener("click", () => {
+        const text = document.getElementById("drawerDraft").innerText;
+        const w = window.open("", "_blank");
+        w.document.write(`<pre>${text}</pre>`);
+        w.print();
+      });
+
+      // Mic & Dropzone handlers (simulated capture)
+      const micBtn = document.getElementById("micBtn");
+      const waveform = document.getElementById("waveform");
+      micBtn.addEventListener("click", () => {
+        waveform.classList.add("active");
+        micBtn.disabled = true;
+        // simulate recording -> populate textarea
+        setTimeout(() => {
+          document.getElementById("intentInput").value =
+            "I lost my job last week and need help finding government support.";
+          waveform.classList.remove("active");
+          micBtn.disabled = false;
+        }, 2200);
+      });
+
+      const dropzone = document.getElementById("dropzone");
+      const fileInput = document.getElementById("fileInput");
+      dropzone.addEventListener("click", () => fileInput.click());
+      dropzone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropzone.classList.add("border-blue-400");
+      });
+      dropzone.addEventListener("dragleave", () =>
+        dropzone.classList.remove("border-blue-400"),
+      );
+      dropzone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropzone.classList.remove("border-blue-400");
+        fileInput.files = e.dataTransfer.files;
+        alert("Files attached — they will be parsed with your intent.");
+      });
+
+      function copyDraftLetter() {
+        const text = document.getElementById("draftLetterContent").innerText;
+        navigator.clipboard.writeText(text);
+        alert("Draft communication copied to clipboard!");
+      }
+    </script>
+  </body>
+</html>
