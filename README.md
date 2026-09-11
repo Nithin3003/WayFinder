@@ -4,13 +4,7 @@ WayFinder (Universal Intent Bridge Core) is an AI-driven platform that translate
 
 ---
 
-## Demo
 
-<video src="https://github.com/Nithin3003/WayFinder/raw/main/WayFinder.mp4" controls="controls" style="max-width: 100%;">
-  Your browser does not support the video tag.
-</video>
-
----
 
 ## Key Features
 
