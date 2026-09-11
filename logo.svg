@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0%" stop-color="#0b2545" />
+      <stop offset="100%" stop-color="#274b7a" />
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="24" fill="url(#g)" />
+  <g fill="#f8e7c2" font-family="Outfit, sans-serif" font-weight="700" font-size="52" text-anchor="middle">
+    <text x="50%" y="56%" dy="6" fill="#f8e7c2">WF</text>
+  </g>
+</svg>
