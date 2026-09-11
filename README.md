@@ -20,3 +20,5 @@ WayFinder (Universal Intent Bridge Core) is an AI-driven platform that translate
 * **AI Core:** Google Generative AI (`google-generativeai`)
 * **Frontend:** HTML5, Tailwind CSS, JavaScript (Fetch API)
 
+<video src="https://github.com/Nithin3003/WayFinder/blob/main/Screen%20Recording%202026-09-11%20143437.mp4" controls="controls" style="max-width: 100%;">
+</video>
